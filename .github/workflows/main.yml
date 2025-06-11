@@ -1,0 +1,32 @@
+name: CI Pipeline with Email Notification
+
+on:
+  workflow_dispatch:  # manual trigger via GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run your main task
+        run: |
+          echo "Running main job..."
+          # Simulate failure
+          exit 1
+
+      - name: Send Email Notification
+        if: always()  # Run regardless of success or failure
+        run: |
+          python sendEmail.py
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          JOB_STATUS: ${{ job.status }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
